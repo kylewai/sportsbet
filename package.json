@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
-    "start": "nodemon app.ts",
+    "start": "cd server && nodemon app.ts",
     "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "dependencies": {
