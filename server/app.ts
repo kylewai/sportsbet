@@ -1,7 +1,6 @@
 import error from "http-errors";
 import express from "express";
 import path from "path";
-import cookieParser from "cookie-parser";
 import logger from "morgan";
 import passport from "passport";
 import * as userService from "./services/userService";
@@ -43,9 +42,9 @@ app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../client/build')));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../client/build/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname + '../client/build/index.html'));
+// });
 
 app.use('/leagues', leagueRouter);
 app.use('/sports', sportRouter);
@@ -67,6 +66,6 @@ app.use(function (err: any, req: express.Request, res: express.Response, _next: 
   res.send(err.message);
 });
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
 
 // module.exports = app;
