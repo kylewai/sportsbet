@@ -43,8 +43,8 @@ app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../client/build')));
-app.get("/", (req, res) => {
-  res.send("what");
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '../client/build/index.html'));
 });
 
 app.use('/leagues', leagueRouter);
