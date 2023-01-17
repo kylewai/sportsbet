@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const passport_1 = __importDefault(require("passport"));
 const userService = __importStar(require("../services/userService"));
+const accountService = __importStar(require("../services/accountService"));
 const router = express_1.default.Router();
 router.post("/login", passport_1.default.authenticate("local", { failureRedirect: "/users/login/failure", failureMessage: true }), async (req, res, next) => {
     res.sendStatus(200);
@@ -46,16 +47,30 @@ const createLoginSession = (req, res, next) => {
     });
 };
 router.post("/register", async (req, res, next) => {
-    const user = await userService.register(req.body.username, req.body.password);
-    res.locals.user = user;
-    next();
+    userService.register(req.body.username, req.body.password)
+        .then(user => {
+        res.locals.user = user;
+        next();
+    })
+        .catch(next);
 }, createLoginSession);
-router.post('/logout', (req, res, next) => {
+router.post("/logout", (req, res, next) => {
     req.logout((err) => {
         if (err) {
             return next(err);
         }
         res.sendStatus(200);
     });
+});
+router.post("/account/balance", async (req, res, next) => {
+    accountService.addBalance(req.user.id, req.body.balance)
+        .then(() => res.sendStatus(200))
+        .catch(next);
+});
+router.post("/placebet", async (req, res, next) => {
+    const placeBetInfo = req.body.placeBetInfo;
+    userService.placeBet(req.user.id, placeBetInfo)
+        .then(() => res.sendStatus(200))
+        .catch(next);
 });
 exports.default = router;

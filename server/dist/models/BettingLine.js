@@ -9,7 +9,6 @@ var BetType;
 })(BetType = exports.BetType || (exports.BetType = {}));
 const getBettingLinesByType = (bettingLines) => {
     return bettingLines?.reduce((map, bettingLine) => {
-        console.log(JSON.stringify(bettingLine));
         map[bettingLine.betType] = bettingLine;
         return map;
     }, {});

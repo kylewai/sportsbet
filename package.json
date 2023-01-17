@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
-    "start": "cd server && node app.ts",
-    "heroku-postbuild": "cd client && npm install && npm run build"
+    "start": "cd server && node ./dist/app.js",
+    "heroku-postbuild": "cd client && npm install && npm run build",
+    "postinstall": "tsc"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",
@@ -42,5 +43,8 @@
     "@types/passport": "^1.0.11",
     "@types/passport-local": "^1.0.34",
     "@types/pg": "^8.6.5"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
