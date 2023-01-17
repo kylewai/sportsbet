@@ -1,14 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.knexPg = void 0;
-const knex_1 = __importDefault(require("knex"));
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config(); //load environment variables into proces.env
-const dbPort = parseInt(process.env.PGPORT || "") || 0;
-exports.knexPg = (0, knex_1.default)({
+var knex_1 = require("knex");
+var dotenv_1 = require("dotenv");
+dotenv_1["default"].config(); //load environment variables into proces.env
+var dbPort = parseInt(process.env.PGPORT || "") || 0;
+exports.knexPg = (0, knex_1["default"])({
     client: "pg",
     connection: {
         connectionString: process.env.DATABASE_URL,

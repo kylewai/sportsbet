@@ -1,21 +1,21 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.createGameTotalLine = exports.createSpreadLine = exports.createMoneyLine = exports.generateBettingLines = exports.createSportEvents = void 0;
-const dbConnection_1 = require("../../dbConnection");
+var dbConnection_1 = require("../../dbConnection");
 function createSportEvents() {
     (0, dbConnection_1.knexPg)("team")
         .select("id", "name", { cityId: "city_id_fkey" }, "wins", "losses", "ties")
-        .then(data => generateEvents(data, 1));
+        .then(function (data) { return generateEvents(data, 1); });
 }
 exports.createSportEvents = createSportEvents;
 function generateEvents(data, numEvents) {
-    let homeTeam;
-    let travelTeam;
-    let eventCityId;
-    let isHomeTeamFavorite;
-    const leagueId = 1;
-    const dateTime = new Date("25 December 2022 12:00 CST");
-    for (let i = 0; i < numEvents; i++) {
+    var homeTeam;
+    var travelTeam;
+    var eventCityId;
+    var isHomeTeamFavorite;
+    var leagueId = 1;
+    var dateTime = new Date("25 December 2022 12:00 CST");
+    for (var i = 0; i < numEvents; i++) {
         homeTeam = data.splice(getRandomIntFromRange(0, data.length), 1)[0]; //get random team as home team
         travelTeam = data.splice(getRandomIntFromRange(0, data.length), 1)[0]; //get random team as travel team
         eventCityId = homeTeam.cityId;
@@ -34,13 +34,13 @@ function generateEvents(data, numEvents) {
             league_id_fkey: leagueId,
             city_id_fkey: eventCityId,
             is_home_team_favorite: isHomeTeamFavorite
-        }, ["id"]).then((insertedRows) => insertedRows.forEach((row) => {
+        }, ["id"]).then(function (insertedRows) { return insertedRows.forEach(function (row) {
             generateBettingLines(row.id, homeTeam, travelTeam, isHomeTeamFavorite);
-        }));
+        }); });
         // generateBettingLines(1, homeTeam, travelTeam, isHomeTeamFavorite);
     }
 }
-const generateIsHomeTeamFavorite = (homeTeam, travelTeam) => {
+var generateIsHomeTeamFavorite = function (homeTeam, travelTeam) {
     if (homeTeam.wins >= travelTeam.wins) {
         return true;
     }
@@ -64,10 +64,10 @@ function getRandomMultipleFromRange(min, max, multiple) {
     return multiple * getRandomIntFromRange(0, ((max - min) / multiple)) + min;
 }
 function generateBettingLines(sportEventId, homeTeam, travelTeam, isHomeTeamFavorite) {
-    const winDifference = Math.abs(homeTeam.wins - travelTeam.wins);
-    const moneyLine = createMoneyLine(winDifference);
-    const spreadLine = createSpreadLine(winDifference);
-    const gameTotalLine = createGameTotalLine();
+    var winDifference = Math.abs(homeTeam.wins - travelTeam.wins);
+    var moneyLine = createMoneyLine(winDifference);
+    var spreadLine = createSpreadLine(winDifference);
+    var gameTotalLine = createGameTotalLine();
     console.log({
         sport_event_id_fkey: sportEventId,
         bet_type: 1,
@@ -78,7 +78,7 @@ function generateBettingLines(sportEventId, homeTeam, travelTeam, isHomeTeamFavo
         bet_type: 2,
         spread: spreadLine.spread,
         favorite_odds: spreadLine.favoriteSpreadOdds,
-        underdog_odds: spreadLine.underdogSpreadOdds,
+        underdog_odds: spreadLine.underdogSpreadOdds
     }, {
         sport_event_id_fkey: sportEventId,
         bet_type: 3,
@@ -99,7 +99,7 @@ function generateBettingLines(sportEventId, homeTeam, travelTeam, isHomeTeamFavo
             bet_type: 2,
             spread: spreadLine.spread,
             favorite_odds: spreadLine.favoriteSpreadOdds,
-            underdog_odds: spreadLine.underdogSpreadOdds,
+            underdog_odds: spreadLine.underdogSpreadOdds
         },
         {
             sport_event_id_fkey: sportEventId,
@@ -112,8 +112,8 @@ function generateBettingLines(sportEventId, homeTeam, travelTeam, isHomeTeamFavo
 }
 exports.generateBettingLines = generateBettingLines;
 function createMoneyLine(winDifference) {
-    let favoriteOdds;
-    let underdogOdds;
+    var favoriteOdds;
+    var underdogOdds;
     if (winDifference >= 4) {
         favoriteOdds = -220;
         favoriteOdds += (winDifference - 4) * -50; //Add to favorite status for each win above 4
@@ -134,9 +134,9 @@ function createMoneyLine(winDifference) {
 }
 exports.createMoneyLine = createMoneyLine;
 function createSpreadLine(winDifference) {
-    let favoriteSpreadOdds = -110;
-    let underdogSpreadOdds = -110;
-    let spread = 1.5;
+    var favoriteSpreadOdds = -110;
+    var underdogSpreadOdds = -110;
+    var spread = 1.5;
     if (winDifference > 2) {
         spread += getRandomMultipleFromRange(1, 2, 0.5);
     }

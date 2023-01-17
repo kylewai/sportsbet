@@ -1,51 +1,113 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.placeBet = exports.addUser = exports.getUserByUsername = exports.getUser = void 0;
-const dbConnection_1 = require("../dbConnection");
-const accountData_1 = require("./accountData");
-const getUser = async (userId) => {
-    return (0, dbConnection_1.knexPg)("user")
-        .where("id", "=", userId)
-        .first("id", "name", "username", "address", "email", { betAccountId: "bet_account_id_fkey" }, "salt", "password");
-};
-exports.getUser = getUser;
-const getUserByUsername = async (username) => {
-    return (0, dbConnection_1.knexPg)("user")
-        .where("username", "=", username)
-        .first("id", "name", "username", "address", "email", { betAccountId: "bet_account_id_fkey" }, "salt", "password");
-};
-exports.getUserByUsername = getUserByUsername;
-const addUser = (username, password, salt) => {
-    return dbConnection_1.knexPg.transaction(async (trx) => {
-        const user = await trx("user")
-            .insert({ "username": username, "password": password, "salt": salt }, ["id"]);
-        await trx("bet_account")
-            .insert({ balance: 0, user_id_fkey: user[0].id });
-        //Does this really need to be a separate query?
-        return await trx("user")
-            .where("id", "=", user[0].id)
-            .first("id", "name", "username", "address", "email", { betAccountId: "bet_account_id_fkey" }, "salt", "password");
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+exports.__esModule = true;
+exports.placeBet = exports.addUser = exports.getUserByUsername = exports.getUser = void 0;
+var dbConnection_1 = require("../dbConnection");
+var accountData_1 = require("./accountData");
+var getUser = function (userId) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, (0, dbConnection_1.knexPg)("user")
+                .where("id", "=", userId)
+                .first("id", "name", "username", "address", "email", { betAccountId: "bet_account_id_fkey" }, "salt", "password")];
+    });
+}); };
+exports.getUser = getUser;
+var getUserByUsername = function (username) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, (0, dbConnection_1.knexPg)("user")
+                .where("username", "=", username)
+                .first("id", "name", "username", "address", "email", { betAccountId: "bet_account_id_fkey" }, "salt", "password")];
+    });
+}); };
+exports.getUserByUsername = getUserByUsername;
+var addUser = function (username, password, salt) {
+    return dbConnection_1.knexPg.transaction(function (trx) { return __awaiter(void 0, void 0, void 0, function () {
+        var user;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, trx("user")
+                        .insert({ "username": username, "password": password, "salt": salt }, ["id"])];
+                case 1:
+                    user = _a.sent();
+                    return [4 /*yield*/, trx("bet_account")
+                            .insert({ balance: 0, user_id_fkey: user[0].id })];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, trx("user")
+                            .where("id", "=", user[0].id)
+                            .first("id", "name", "username", "address", "email", { betAccountId: "bet_account_id_fkey" }, "salt", "password")];
+                case 3: 
+                //Does this really need to be a separate query?
+                return [2 /*return*/, _a.sent()];
+            }
+        });
+    }); });
 };
 exports.addUser = addUser;
-const placeBet = (userId, placeBetInfo) => {
+var placeBet = function (userId, placeBetInfo) {
     //Add to bet table
     //Decrement account balance.
-    return dbConnection_1.knexPg.transaction(async (trx) => {
-        return Promise.all(placeBetInfo.map(async (info) => {
-            await trx("bet")
-                .insert({
-                "user_id_fkey": userId,
-                "wager": info.wager,
-                "over_under_pos": info.overOrUnder,
-                "favorite_underdog_pos": info.favoriteOrUnderdog,
-                "betting_line_id_fkey": info.bettingLineId,
-                "spread": info.spread,
-                "game_total": info.gameTotal,
-                "odds": info.odds
-            });
-            await (0, accountData_1.removeBalance)(userId, info.wager, trx);
-        }));
-    });
+    return dbConnection_1.knexPg.transaction(function (trx) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, Promise.all(placeBetInfo.map(function (info) { return __awaiter(void 0, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, trx("bet")
+                                    .insert({
+                                    "user_id_fkey": userId,
+                                    "wager": info.wager,
+                                    "over_under_pos": info.overOrUnder,
+                                    "favorite_underdog_pos": info.favoriteOrUnderdog,
+                                    "betting_line_id_fkey": info.bettingLineId,
+                                    "spread": info.spread,
+                                    "game_total": info.gameTotal,
+                                    "odds": info.odds
+                                })];
+                            case 1:
+                                _a.sent();
+                                return [4 /*yield*/, (0, accountData_1.removeBalance)(userId, info.wager, trx)];
+                            case 2:
+                                _a.sent();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); }))];
+        });
+    }); });
 };
 exports.placeBet = placeBet;
