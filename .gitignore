@@ -1,5 +1,7 @@
 .vscode/
 */node_modules
+dist/
+server/session/
 npm-debug.log
 .DS_Store
 /*.env

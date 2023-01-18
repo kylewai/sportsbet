@@ -41,15 +41,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, '../client/build')));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../../client/build/index.html'));
-});
+app.use(express.static(path.join(__dirname, '../../client/build')));
 
 app.use('/leagues', leagueRouter);
 app.use('/sports', sportRouter);
 app.use('/users', userRouter);
 
+// app.get('*', (req, res) => {
+//   console.log(__dirname);
+//   res.sendFile(path.join(__dirname + '../../client/build/index.html'));
+// });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(error(404));
