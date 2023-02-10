@@ -1,3 +1,4 @@
+import { Knex } from "knex";
 import { knexPg } from "../../dbConnection";
 import { ITeam } from "../../models/Team";
 
@@ -7,7 +8,7 @@ export function createSportEvents() {
         .then(data => generateEvents(data, 1));
 }
 
-function generateEvents(data: ITeam[], numEvents: number) {
+async function generateEvents(data: ITeam[], numEvents: number) {
     let homeTeam: ITeam;
     let travelTeam: ITeam;
     let eventCityId: number;
@@ -25,24 +26,23 @@ function generateEvents(data: ITeam[], numEvents: number) {
             travelTeam: travelTeam.name,
             cityId: eventCityId
         });
-        knexPg("sport_event")
-            .insert(
-                {
-                    home_team_id_fkey: homeTeam.id,
-                    travel_team_id_fkey: travelTeam.id,
-                    dt_tm: dateTime,
-                    league_id_fkey: leagueId,
-                    city_id_fkey: eventCityId,
-                    is_home_team_favorite: isHomeTeamFavorite
-                },
-                ["id"]
-            ).then((insertedRows) => insertedRows.forEach((row) => {
-                generateBettingLines(row.id, homeTeam, travelTeam, isHomeTeamFavorite);
-            }));
-
-        // generateBettingLines(1, homeTeam, travelTeam, isHomeTeamFavorite);
-
-
+        await knexPg.transaction(async (trx) => {
+            const insertedRows = await trx("sport_event")
+                .insert(
+                    {
+                        home_team_id_fkey: homeTeam.id,
+                        travel_team_id_fkey: travelTeam.id,
+                        dt_tm: dateTime,
+                        league_id_fkey: leagueId,
+                        city_id_fkey: eventCityId,
+                        is_home_team_favorite: isHomeTeamFavorite
+                    },
+                    ["id"]
+                );
+            await insertedRows.forEach((row) => {
+                generateBettingLines(row.id, homeTeam, travelTeam, isHomeTeamFavorite, trx);
+            });
+        });
     }
 }
 
@@ -73,11 +73,12 @@ function getRandomMultipleFromRange(min: number, max: number, multiple: number):
 }
 
 
-export function generateBettingLines(
+export async function generateBettingLines(
     sportEventId: number,
     homeTeam: ITeam,
     travelTeam: ITeam,
-    isHomeTeamFavorite: boolean) {
+    isHomeTeamFavorite: boolean,
+    trx: Knex.Transaction) {
 
     const winDifference = Math.abs(homeTeam.wins - travelTeam.wins);
     const moneyLine = createMoneyLine(winDifference);
@@ -104,7 +105,7 @@ export function generateBettingLines(
             over_odds: gameTotalLine.overOdds,
             under_odds: gameTotalLine.underOdds
         });
-    knexPg("betting_line")
+    let query = knexPg("betting_line")
         .insert(
             [
                 {
@@ -128,7 +129,9 @@ export function generateBettingLines(
                     under_odds: gameTotalLine.underOdds
                 }
             ]
-        ).then();
+        );
+    query = query.transacting(trx);
+    return query.then();
 }
 
 export function createMoneyLine(winDifference: number) {

@@ -5,25 +5,43 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import { useRef, useState } from "react";
-import { manageErrors } from "../utils/DataFetcher";
+import { apiFetcher, manageErrors } from "../utils/DataFetcher";
+import { NavigateFunction, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useContext } from 'react';
+import { AuthContext } from '../auth/AuthProvider';
+import useSWR, { useSWRConfig } from "swr";
 
-
-
-
-
+interface IUserBalance {
+    balance: number;
+}
 export const Account = () => {
+    const { isAuthenticated, setAuthRequest, authRequest } = useContext(AuthContext);
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setAuthRequest({ isAuthRequested: true, previousRoute: previousRoute });
+        }
+    }, [isAuthenticated]);
+    const { data, error } = useSWR<IUserBalance, Error>("/api/users/account/balance", apiFetcher);
+    const { mutate } = useSWRConfig();
     const balanceInput = useRef<HTMLInputElement>(null);
     const [errMsg, setErrMsg] = useState("");
     const [snackBarOpen, setSnackBarOpen] = useState(false);
+    const previousRoute = useLocation().state;
+
+    if (error) {
+        return <div>{error.message}</div>;
+    }
+
     const transferMoney = () => {
         const money = Number(balanceInput.current?.value);
         if (money <= 0) {
             setErrMsg("Please enter a positive amount");
             return;
         }
+        balanceInput.current!.value = "";
         setErrMsg("");
         fetch(
-            "/users/account/balance",
+            "/api/users/account/balance",
             {
                 method: "POST",
                 body: JSON.stringify(
@@ -39,6 +57,7 @@ export const Account = () => {
             .then((response) => manageErrors(response))
             .then(() => {
                 setSnackBarOpen(true);
+                mutate("/api/users/account/balance");
             })
             .catch((error: Error) => setErrMsg(error.message));;
     }
@@ -51,7 +70,7 @@ export const Account = () => {
                             <Typography variant="body1">Your Balance: </Typography>
                         </Grid>
                         <Grid item>
-                            <Typography variant="body1">$100.00 </Typography>
+                            <Typography variant="body1">${data?.balance || 0}</Typography>
                         </Grid>
                     </Grid>
                     <Grid item container alignItems="stretch">

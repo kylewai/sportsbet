@@ -43,9 +43,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../../client/build')));
 
-app.use('/leagues', leagueRouter);
-app.use('/sports', sportRouter);
-app.use('/users', userRouter);
+app.use('/api/leagues', leagueRouter);
+app.use('/api/sports', sportRouter);
+app.use('/api/users', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -37,7 +37,7 @@ export const SignIn = (props: { setIsAuthenticated: (isAuth: boolean) => void })
             return;
         }
 
-        fetch("/users/login",
+        fetch("/api/users/login",
             {
                 method: "POST",
                 body: JSON.stringify(
@@ -78,8 +78,8 @@ export const SignIn = (props: { setIsAuthenticated: (isAuth: boolean) => void })
             aria-describedby="modal-modal-description"
         >
             <Box sx={authFormStyle} component="form">
-                <TextField inputRef={usernameInputRef} fullWidth margin="dense" id="outlined-basic" label="Username" variant="outlined" />
-                <TextField inputRef={passwordInputRef} fullWidth margin="dense" id="outlined-basic" label="Password" type="password" variant="outlined" />
+                <TextField inputRef={usernameInputRef} fullWidth margin="dense" label="Username" variant="outlined" />
+                <TextField inputRef={passwordInputRef} fullWidth margin="dense" label="Password" type="password" variant="outlined" />
                 <p style={{ color: "red" }}>{errMsg}</p>
                 <Stack direction="column" spacing={1} alignItems="center" sx={{ marginTop: 1 }}>
                     <Button onClick={authenticate} sx={{ width: 400 }} variant="contained" size="large">Sign in</Button>

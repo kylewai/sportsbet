@@ -38,12 +38,17 @@ router.post("/logout", (req, res, next) => {
     });
 });
 
-router.post("/account/balance",
-    async (req, res, next) => {
-        accountService.addBalance((req.user as IUser).id, req.body.balance)
-            .then(() => res.sendStatus(200))
-            .catch(next);
-    }
+router.get("/account/balance", (req, res, next) => {
+    accountService.getBalance((req.user as IUser).id)
+        .then((balance) => res.json({ balance }))
+        .catch(next);
+});
+
+router.post("/account/balance", (req, res, next) => {
+    accountService.addBalance((req.user as IUser).id, req.body.balance)
+        .then(() => res.sendStatus(200))
+        .catch(next);
+}
 );
 
 router.post("/placebet", async (req, res, next) => {

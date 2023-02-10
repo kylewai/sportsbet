@@ -7,18 +7,37 @@ import { IBettingLine, BetType, BetPosition } from "./models/BettingLine";
 import { apiFetcher } from "./utils/DataFetcher";
 import { Typography } from "@mui/material";
 import "./App.css";
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BetSlipContext, BetSlipProvider, IBetSlip, IBetSlipInfo } from './BetSlipProvider';
 import { SportEventContext, SportEventProvider } from './SportEventProvider';
 import { convertOddsToString, getBetCellId, getOddsData } from './utils/betUtils';
+import { BetSlip } from './BetSlip';
+import { AuthedComponent } from './auth/AuthedComponent';
 
 export interface IBettingEventsLocationProps {
 	isSuccessfulBet: boolean;
 }
+
+const AuthedBetSlip = () => {
+	const { setBetSlipInfo, shouldShowBetSlip, setShouldShowBetSlip } = useContext(BetSlipContext);
+	const onAuthCancelled = () => {
+		setBetSlipInfo({});
+		setShouldShowBetSlip(false);
+	}
+	return (
+		shouldShowBetSlip ?
+			<AuthedComponent onAuthCancelled={onAuthCancelled}>
+				<BetSlip />
+			</AuthedComponent>
+			:
+			null
+	);
+}
+
 export const BettingEventsList = () => {
 	const { leagueId } = useParams();
 	const location = useLocation();
-	const { data, error } = useSWR<ISportEvent[], Error>("/leagues/" + leagueId + "/events", apiFetcher);
+	const { data, error } = useSWR<ISportEvent[], Error>("/api/leagues/" + leagueId + "/events", apiFetcher);
 
 	if (error) {
 		console.log(error.message);
@@ -41,8 +60,8 @@ export const BettingEventsList = () => {
 					</Grid>
 				))}
 			</Grid>
-			{/* <BetSlip /> */}
-			<Outlet context={location.pathname} />
+			{<AuthedBetSlip />}
+			{/* <Outlet context={location.pathname} /> */}
 		</BetSlipProvider>
 	)
 }
@@ -130,7 +149,7 @@ const BettingLineSection = ({ betData }: IBettingLineSectionProps) => {
 
 const MoneyBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSectionProps) => {
 	const navigate = useNavigate();
-	const { setBetSlipInfo } = useContext(BetSlipContext);
+	const { setBetSlipInfo, setShouldShowBetSlip } = useContext(BetSlipContext);
 	const sportEvent = useContext(SportEventContext);
 	const location = useLocation();
 
@@ -143,12 +162,12 @@ const MoneyBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSecti
 
 	return (
 		<Grid item container sm={2} direction="column" alignItems="center">
-			<BettingLineCell id={isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, navigate, location.pathname, setBetSlipInfo)}>
+			<BettingLineCell id={isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, setShouldShowBetSlip, setBetSlipInfo)}>
 				<Typography align="center" sx={{ color: "#5c916e", paddingY: "10px", fontWeight: "bold", fontSize: 'default' }}>
 					{isFavoriteAbove ? favoriteOdds : underdogOdds}
 				</Typography>
 			</BettingLineCell>
-			<BettingLineCell id={!isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(!isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, navigate, location.pathname, setBetSlipInfo)}>
+			<BettingLineCell id={!isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(!isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, setShouldShowBetSlip, setBetSlipInfo)}>
 				<Typography align="center" sx={{ color: "#5c916e", paddingY: "10px", fontWeight: "bold", fontSize: 'default' }}>
 					{!isFavoriteAbove ? favoriteOdds : underdogOdds}
 				</Typography>
@@ -159,7 +178,7 @@ const MoneyBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSecti
 
 const SpreadBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSectionProps) => {
 	const navigate = useNavigate();
-	const { setBetSlipInfo } = useContext(BetSlipContext);
+	const { setBetSlipInfo, setShouldShowBetSlip } = useContext(BetSlipContext);
 	const sportEvent = useContext(SportEventContext);
 	const location = useLocation();
 
@@ -172,7 +191,7 @@ const SpreadBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSect
 
 	return (
 		<Grid item container sm={2} direction="column" alignItems="center">
-			<BettingLineCell id={isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, navigate, location.pathname, setBetSlipInfo)}>
+			<BettingLineCell id={isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, setShouldShowBetSlip, setBetSlipInfo)}>
 				<Grid item sm={3}>
 					<Typography align="center" sx={{ paddingY: "10px", fontWeight: "light", fontSize: 'default' }}>
 						{isFavoriteAbove ? favoriteSpread : underdogSpread}
@@ -184,7 +203,7 @@ const SpreadBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSect
 					</Typography>
 				</Grid>
 			</BettingLineCell>
-			<BettingLineCell id={!isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(!isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, navigate, location.pathname, setBetSlipInfo)}>
+			<BettingLineCell id={!isFavoriteAbove ? favoriteBetSlipInfo.betCellId : underdogBetSlipInfo.betCellId} betHandler={getBetHandler(!isFavoriteAbove ? favoriteBetSlipInfo : underdogBetSlipInfo, setShouldShowBetSlip, setBetSlipInfo)}>
 				<Grid item sm={3}>
 					<Typography align="center" sx={{ paddingY: "10px", fontWeight: "light", fontSize: 'default' }}>
 						{!isFavoriteAbove ? favoriteSpread : underdogSpread}
@@ -202,7 +221,7 @@ const SpreadBettingLineSection = ({ betData, isFavoriteAbove }: IBettingLineSect
 
 const GameTotalBettingLineSection = ({ betData }: IBettingLineSectionProps) => {
 	const navigate = useNavigate();
-	const { setBetSlipInfo } = useContext(BetSlipContext);
+	const { setBetSlipInfo, setShouldShowBetSlip } = useContext(BetSlipContext);
 	const sportEvent = useContext(SportEventContext);
 	const location = useLocation();
 
@@ -215,7 +234,7 @@ const GameTotalBettingLineSection = ({ betData }: IBettingLineSectionProps) => {
 
 	return (
 		<Grid item container direction="column" sm={2} alignItems="center">
-			<BettingLineCell id={overBetSlipInfo.betCellId} betHandler={getBetHandler(overBetSlipInfo, navigate, location.pathname, setBetSlipInfo)}>
+			<BettingLineCell id={overBetSlipInfo.betCellId} betHandler={getBetHandler(overBetSlipInfo, setShouldShowBetSlip, setBetSlipInfo)}>
 				<Grid item sm={4}>
 					<Typography sx={{ paddingY: "10px", fontWeight: "light", fontSize: 'default' }}>O {betData.gameTotal}</Typography>
 				</Grid>
@@ -223,7 +242,7 @@ const GameTotalBettingLineSection = ({ betData }: IBettingLineSectionProps) => {
 					<Typography sx={{ color: "#5c916e", paddingY: "10px", fontWeight: "bold", fontSize: 'default' }}>{overOdds}</Typography>
 				</Grid>
 			</BettingLineCell>
-			<BettingLineCell id={underBetSlipInfo.betCellId} betHandler={getBetHandler(underBetSlipInfo, navigate, location.pathname, setBetSlipInfo)}>
+			<BettingLineCell id={underBetSlipInfo.betCellId} betHandler={getBetHandler(underBetSlipInfo, setShouldShowBetSlip, setBetSlipInfo)}>
 				<Grid item sm={4}>
 					<Typography sx={{ paddingY: "10px", fontWeight: "light", fontSize: 'default' }}>U {betData.gameTotal}</Typography>
 				</Grid>
@@ -288,7 +307,8 @@ const getFavUnderdogBetSlipInfo = (bettingLineData: IBettingLine, sportEvent: IS
 	const betSlipInfo = {
 		betId: bettingLineData.id,
 		matchSummary: sportEvent.travelTeam.name + " @ " + sportEvent.homeTeam.name,
-		spread: bettingLineData.spread ? convertOddsToString(bettingLineData.spread) : undefined
+		spread: bettingLineData.spread ? convertOddsToString(bettingLineData.spread) : undefined,
+		wager: 0
 	}
 
 	return [
@@ -312,7 +332,8 @@ const getOverUnderBetSlipInfo = (bettingLineData: IBettingLine, sportEvent: ISpo
 		betId: bettingLineData.id,
 		betType: bettingLineData.betType,
 		matchSummary: sportEvent.travelTeam.name + " @ " + sportEvent.homeTeam.name,
-		gameTotal: bettingLineData.gameTotal
+		gameTotal: bettingLineData.gameTotal,
+		wager: 0
 	}
 
 	return [
@@ -331,8 +352,7 @@ const getOverUnderBetSlipInfo = (bettingLineData: IBettingLine, sportEvent: ISpo
 
 const getBetHandler = (
 	betSlipInfo: IBetSlipInfo,
-	navigate: NavigateFunction,
-	previousRoute: string,
+	setShouldShowBetSlip: React.Dispatch<React.SetStateAction<boolean>>,
 	setBetSlipInfo: React.Dispatch<React.SetStateAction<IBetSlip>>) => {
 
 	return () => {
@@ -346,8 +366,9 @@ const getBetHandler = (
 			newInfos[newBetCellId] = betSlipInfo;
 			return newInfos;
 		});
-		navigate("betSlip", {
-			state: previousRoute
-		});
+		setShouldShowBetSlip(true);
+		// navigate("betSlip", {
+		// 	state: previousRoute
+		// });
 	}
 }

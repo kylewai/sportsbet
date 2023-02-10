@@ -28,8 +28,8 @@ export interface ISport {
 }
 
 export const Sidebar = () => {
-    const { data: leagues, error: leagueError } = useSWR<ILeague[], Error>("/leagues", apiFetcher);
-    const { data: sports, error: sportError } = useSWR<ISport[], Error>("/sports", apiFetcher);
+    const { data: leagues, error: leagueError } = useSWR<ILeague[], Error>("/api/leagues", apiFetcher);
+    const { data: sports, error: sportError } = useSWR<ISport[], Error>("/api/sports", apiFetcher);
 
     if (leagueError) {
         console.log(leagueError);

@@ -9,6 +9,7 @@ import { SignUp } from "./auth/SignUp";
 import { BettingEventsList } from "./BetEvents";
 import { BetSlip } from './BetSlip';
 import { Account } from './user/Account';
+import { AuthedComponent } from './auth/AuthedComponent';
 
 function App() {
   return (
@@ -19,11 +20,10 @@ function App() {
             <Route path="/" element={<Home />}>
               <Route path="leagues">
                 <Route path=":leagueId/events" element={<BettingEventsList />}>
-                  <Route path="betSlip" element={<BetSlip />} />
                 </Route>
               </Route>
             </Route>
-            <Route path="/account" element={<Account />} />
+            <Route path="/account" element={<AuthedComponent><Account /></AuthedComponent>} />
           </Route>
           <Route path="/signup" element={<SignUp />} />
         </Routes>

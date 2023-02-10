@@ -34,7 +34,7 @@ export const SignUp = () => {
             setErrMsg("Username and password must be filled out");
             return;
         }
-        fetch("/users/register",
+        fetch("/api/users/register",
             {
                 method: "POST",
                 body: JSON.stringify(

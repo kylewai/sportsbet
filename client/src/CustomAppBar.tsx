@@ -8,7 +8,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useContext, useRef, useState } from "react";
 import { AuthContext } from "./auth/AuthProvider";
 import { manageErrors } from "./utils/DataFetcher";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 
@@ -18,26 +18,27 @@ export const CustomAppBar = () => {
   const { isAuthenticated, setAuthRequest, setIsAuthenticated } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const openMenu = (event: React.MouseEvent<HTMLElement>) => {
-    console.log(anchorEl);
     setAnchorEl(event.currentTarget);
   }
 
   const handleLogout = () => {
     setAnchorEl(null);
-    fetch("/users/logout", {
+    fetch("/api/users/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       }
     })
       .then((response) => manageErrors(response))
-      .then(() => setIsAuthenticated(false));
+      .then(() => setIsAuthenticated(false))
+      .then(() => navigate("/"));
   };
 
   return (
@@ -80,7 +81,7 @@ export const CustomAppBar = () => {
                 open={anchorEl != null}
                 onClose={handleClose}
               >
-                <Link to="/account" style={{ color: 'inherit', textDecoration: 'inherit' }}><MenuItem onClick={handleClose}>Account</MenuItem></Link>
+                <Link to="/account" state={{ previousRoute: location.pathname }} style={{ color: 'inherit', textDecoration: 'inherit' }}><MenuItem onClick={handleClose}>Account</MenuItem></Link>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>}

@@ -6,8 +6,6 @@ import { TransitionGroup } from 'react-transition-group';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { deepOrange } from '@mui/material/colors';
 import Avatar from '@mui/material/Avatar';
-import Modal from '@mui/material/Modal';
-import Popper from '@mui/material/Popper';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -48,30 +46,20 @@ interface IFieldErrors {
 }
 
 export const BetSlip = () => {
-    const { isAuthenticated, setAuthRequest } = useContext(AuthContext);
     const wagerTextFields = useRef<IWagerFields>({});
     const [errMsg, setErrMsg] = useState("");
     const navigate = useNavigate();
     const { betSlip, setBetSlipInfo } = useContext(BetSlipContext);
     const [errorTexts, setErrorTexts] = useState<IFieldErrors>({});
     const [expanded, setExpanded] = useState(true);
-    const previousRoute = useLocation().state;
 
     function getWagerFields() {
         return wagerTextFields.current;
     }
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            setAuthRequest({ isAuthRequested: true, previousRoute: previousRoute, onAuthCancelled: () => setBetSlipInfo({}) });
-        }
         validateWagerFields();
-    }, [isAuthenticated]);
-
-    const onClose = () => {
-        // updateBetSlipWagerValues();
-        // navigate(-1);
-    }
+    }, []);
 
     const handleWagerChange = (e: ChangeEvent<HTMLInputElement>) => {
         validateWagerField(+e.currentTarget.value, e.currentTarget.name);
@@ -98,7 +86,7 @@ export const BetSlip = () => {
             }
         });
 
-        fetch("/users/placebet",
+        fetch("/api/users/placebet",
             {
                 method: "POST",
                 headers: {
@@ -187,7 +175,6 @@ export const BetSlip = () => {
     return (
         (betSlip
             && Object.keys(betSlip).length === 0)
-            || !isAuthenticated
             ? null :
             <ClickAwayListener onClickAway={() => setExpanded(false)}>
                 <Box component="div" sx={authFormStyle}>
@@ -253,6 +240,7 @@ export const BetSlip = () => {
                                                         onChange={handleWagerChange}
                                                         // inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                                                         type="number"
+                                                        defaultValue={0}
                                                         variant="outlined"
                                                     />
                                                 </Grid>
