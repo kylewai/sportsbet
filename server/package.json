@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
-    "start": "node app.js",
+    "start": "node ./dist/app.js",
     "postinstall": "tsc"
   },
   "dependencies": {
