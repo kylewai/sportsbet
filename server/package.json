@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
-    "start": "nodemon app.ts",
+    "start": "node app.js",
     "postinstall": "tsc"
   },
   "dependencies": {
