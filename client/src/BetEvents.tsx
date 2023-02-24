@@ -37,7 +37,7 @@ const AuthedBetSlip = () => {
 export const BettingEventsList = () => {
 	const { leagueId } = useParams();
 	const location = useLocation();
-	const { data, error } = useSWR<ISportEvent[], Error>("/api/leagues/" + leagueId + "/events", apiFetcher, { refreshInterval: 1000 });
+	const { data, error } = useSWR<ISportEvent[], Error>("/api/leagues/" + leagueId + "/events", apiFetcher, { refreshInterval: 60000 });
 
 	if (error) {
 		console.log(error.message);
