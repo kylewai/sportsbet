@@ -51,9 +51,10 @@ export const BettingEventsList = () => {
 	return (
 		<BetSlipProvider>
 			<Grid container rowSpacing={0} alignItems="center" style={{ userSelect: "none" }}>
-				{Object.keys(eventsByDate).map((dateString, index) => (
+				{Object.keys(eventsByDate).sort().reverse().map((dateString, index) => (
+
 					<Grid container key={index}>
-						<EventHeader date={dateString} />
+						<EventHeader date={getShortDate(dateString)} />
 						<Grid item container >
 							{eventsByDate[dateString].map((sportEvent, index) => <SportEventOverview key={index} sportEvent={sportEvent} />)}
 						</Grid>
@@ -276,7 +277,7 @@ const BettingLineCell = ({ betHandler, children, id }: IBettingLineCellProps) =>
 
 const getSportEventsByDate = (data: ISportEvent[]) => {
 	return data.reduce<{ [date: string]: ISportEvent[] }>((accumlateEvents, sportEvent) => {
-		const dateString = getShortDate(new Date(sportEvent.dateTime));
+		const dateString = sportEvent.dateTime.split("T")[0];
 		if (typeof accumlateEvents[dateString] === "undefined") {
 			accumlateEvents[dateString] = [];
 		}
@@ -285,13 +286,16 @@ const getSportEventsByDate = (data: ISportEvent[]) => {
 	}, {});
 }
 
-const getShortDate = (date: Date) => {
+const getShortDate = (date: string) => {
+	let parts = date.split('-');
+	var localDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+	console.log(localDate.toDateString());
 	const dateOptions: Intl.DateTimeFormatOptions = {
 		weekday: "short",
 		month: "short",
 		day: "numeric"
 	};
-	return date.toLocaleDateString(undefined, dateOptions).replace(",", "");
+	return localDate.toLocaleDateString(undefined, dateOptions).replace(",", "");
 }
 
 const getAMPMTime = (dateTime: Date) => {
@@ -307,8 +311,7 @@ const getFavUnderdogBetSlipInfo = (bettingLineData: IBettingLine, sportEvent: IS
 	const betSlipInfo = {
 		betId: bettingLineData.id,
 		matchSummary: sportEvent.travelTeam.name + " @ " + sportEvent.homeTeam.name,
-		spread: bettingLineData.spread ? convertOddsToString(bettingLineData.spread) : undefined,
-		wager: 0
+		spread: bettingLineData.spread ? convertOddsToString(bettingLineData.spread) : undefined
 	}
 
 	return [
@@ -332,8 +335,7 @@ const getOverUnderBetSlipInfo = (bettingLineData: IBettingLine, sportEvent: ISpo
 		betId: bettingLineData.id,
 		betType: bettingLineData.betType,
 		matchSummary: sportEvent.travelTeam.name + " @ " + sportEvent.homeTeam.name,
-		gameTotal: bettingLineData.gameTotal,
-		wager: 0
+		gameTotal: bettingLineData.gameTotal
 	}
 
 	return [

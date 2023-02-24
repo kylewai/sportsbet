@@ -14,18 +14,14 @@ async function generateEvents(data: ITeam[], numEvents: number) {
     let eventCityId: number;
     let isHomeTeamFavorite: boolean;
     const leagueId = 1;
-    const dateTime = new Date("25 December 2022 12:00 CST");
+    const dateTime = new Date();
+    dateTime.setDate(dateTime.getDate() + (0 + 7 - dateTime.getDay()) % 7);
+    dateTime.setHours(11, 0, 0); //NFL 11:00 AM MST kick off
     for (let i = 0; i < numEvents; i++) {
         homeTeam = data.splice(getRandomIntFromRange(0, data.length), 1)[0]; //get random team as home team
         travelTeam = data.splice(getRandomIntFromRange(0, data.length), 1)[0]; //get random team as travel team
         eventCityId = homeTeam.cityId;
         isHomeTeamFavorite = generateIsHomeTeamFavorite(homeTeam, travelTeam);
-        console.log({
-            isHomeTeamFavorite: isHomeTeamFavorite,
-            homeTeam: homeTeam.name,
-            travelTeam: travelTeam.name,
-            cityId: eventCityId
-        });
         await knexPg.transaction(async (trx) => {
             const insertedRows = await trx("sport_event")
                 .insert(
@@ -40,7 +36,7 @@ async function generateEvents(data: ITeam[], numEvents: number) {
                     ["id"]
                 );
             await insertedRows.forEach((row) => {
-                generateBettingLines(row.id, homeTeam, travelTeam, isHomeTeamFavorite, trx);
+                generateBettingLines(row.id, homeTeam, travelTeam, trx);
             });
         });
     }
@@ -58,7 +54,7 @@ const generateIsHomeTeamFavorite = (homeTeam: ITeam, travelTeam: ITeam) => {
     }
 }
 
-createSportEvents();
+// createSportEvents();
 
 //Inclusive of max
 function getRandomIntFromRange(min: number, max: number) {
@@ -77,7 +73,6 @@ export async function generateBettingLines(
     sportEventId: number,
     homeTeam: ITeam,
     travelTeam: ITeam,
-    isHomeTeamFavorite: boolean,
     trx: Knex.Transaction) {
 
     const winDifference = Math.abs(homeTeam.wins - travelTeam.wins);
@@ -85,26 +80,27 @@ export async function generateBettingLines(
     const spreadLine = createSpreadLine(winDifference);
     const gameTotalLine = createGameTotalLine();
 
-    console.log({
-        sport_event_id_fkey: sportEventId,
-        bet_type: 1,
-        favorite_odds: moneyLine.favoriteOdds,
-        underdog_odds: moneyLine.underdogOdds
-    },
-        {
-            sport_event_id_fkey: sportEventId,
-            bet_type: 2,
-            spread: spreadLine.spread,
-            favorite_odds: spreadLine.favoriteSpreadOdds,
-            underdog_odds: spreadLine.underdogSpreadOdds,
-        },
-        {
-            sport_event_id_fkey: sportEventId,
-            bet_type: 3,
-            game_total: gameTotalLine.gameTotal,
-            over_odds: gameTotalLine.overOdds,
-            under_odds: gameTotalLine.underOdds
-        });
+    // console.log({
+    //     sport_event_id_fkey: sportEventId,
+    //     bet_type: 1,
+    //     favorite_odds: moneyLine.favoriteOdds,
+    //     underdog_odds: moneyLine.underdogOdds
+    // },
+    //     {
+    //         sport_event_id_fkey: sportEventId,
+    //         bet_type: 2,
+    //         spread: spreadLine.spread,
+    //         favorite_odds: spreadLine.favoriteSpreadOdds,
+    //         underdog_odds: spreadLine.underdogSpreadOdds,
+    //     },
+    //     {
+    //         sport_event_id_fkey: sportEventId,
+    //         bet_type: 3,
+    //         game_total: gameTotalLine.gameTotal,
+    //         over_odds: gameTotalLine.overOdds,
+    //         under_odds: gameTotalLine.underOdds
+    //     });
+
     let query = knexPg("betting_line")
         .insert(
             [

@@ -104,17 +104,17 @@ export const BetSlip = () => {
             .catch((error: Error) => setErrMsg(error.message));
     }
 
-    const updateBetSlipWagerValues = () => {
-        const wagerFields = getWagerFields();
-        const newBetSlipInfo = { ...betSlip };
-        Object.keys(newBetSlipInfo).forEach((betCellId, index) => {
-            newBetSlipInfo[betCellId] = {
-                ...newBetSlipInfo[betCellId],
-                wager: Number(wagerFields[betCellId].value)
-            }
-        });
-        setBetSlipInfo(newBetSlipInfo);
-    }
+    // const updateBetSlipWagerValues = () => {
+    //     const wagerFields = getWagerFields();
+    //     const newBetSlipInfo = { ...betSlip };
+    //     Object.keys(newBetSlipInfo).forEach((betCellId, index) => {
+    //         newBetSlipInfo[betCellId] = {
+    //             ...newBetSlipInfo[betCellId],
+    //             wager: Number(wagerFields[betCellId].value)
+    //         }
+    //     });
+    //     setBetSlipInfo(newBetSlipInfo);
+    // }
 
     const getWagerValues = () => {
         const wagerFields = getWagerFields();

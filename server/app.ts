@@ -63,6 +63,8 @@ app.use(function (err: any, req: express.Request, res: express.Response, _next: 
   res.send(err.message);
 });
 
+// createSportEvents();
+
 app.listen(process.env.PORT || 3000);
 
 // module.exports = app;
