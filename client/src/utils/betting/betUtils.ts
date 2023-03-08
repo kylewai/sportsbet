@@ -1,5 +1,6 @@
-import { IBetSlipInfo } from "../BetSlipProvider";
-import { BetType, BetPosition, IBettingLine } from "../models/BettingLine";
+import { IBetSlipItem } from "@betting/BetSlipProvider";
+import { ISportEvent } from "models/SportEvent";
+import { BetType, BetPosition, IBettingLine } from "../../models/BettingLine";
 
 interface IOddsData {
     favoriteSpread: string;
@@ -34,12 +35,12 @@ export const getOddsData = (betData: IBettingLine): IOddsData => {
     }
 
     return {
-        favoriteSpread: favoriteSpread,
-        underdogSpread: underdogSpread,
-        favoriteOdds: favoriteOdds,
-        underdogOdds: underdogOdds,
-        overOdds: overOdds,
-        underOdds: underOdds
+        favoriteSpread,
+        underdogSpread,
+        favoriteOdds,
+        underdogOdds,
+        overOdds,
+        underOdds
     }
 }
 
@@ -50,7 +51,7 @@ export const getBetCellId = (bettingLineData: IBettingLine, betPosition: BetPosi
     return bettingLineData.id + "~" + bettingLineData.betType + "~" + betPosition;
 }
 
-export const getFavoriteOrUnderdog = (info: IBetSlipInfo) => {
+export const getFavoriteOrUnderdog = (info: IBetSlipItem) => {
     const cellInfo = getBetCellIdInfo(info.betCellId);
     if (cellInfo.betPosition === BetPosition.Favorite) {
         return true;
@@ -63,7 +64,7 @@ export const getFavoriteOrUnderdog = (info: IBetSlipInfo) => {
     }
 }
 
-export const getOverOrUnder = (info: IBetSlipInfo) => {
+export const getOverOrUnder = (info: IBetSlipItem) => {
     const cellInfo = getBetCellIdInfo(info.betCellId);
     if (cellInfo.betPosition === BetPosition.Over) {
         return true;
@@ -83,4 +84,37 @@ export const getBetCellIdInfo = (compositeId: string) => {
         betType: Number(pieces[1]),
         betPosition: Number(pieces[2])
     }
+}
+
+export const getSportEventsByDate = (data: ISportEvent[]) => {
+    return data.reduce<{ [date: string]: ISportEvent[] }>((accumlateEvents, sportEvent) => {
+        const dateString = sportEvent.dateTime.split("T")[0];
+        if (typeof accumlateEvents[dateString] === "undefined") {
+            accumlateEvents[dateString] = [];
+        }
+        accumlateEvents[dateString].push(sportEvent);
+        return accumlateEvents;
+    }, {});
+}
+
+//date: ISO8601 formatted date string
+//returns ex. 2022-12-11 => Sun Dec 11
+export const getShortDate = (date: string) => {
+    let parts = date.split('-');
+    var localDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    const dateOptions: Intl.DateTimeFormatOptions = {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+    };
+    return localDate.toLocaleDateString(undefined, dateOptions).replace(",", "");
+}
+
+export const getAMPMTime = (dateTime: Date) => {
+    const timeOptions: Intl.DateTimeFormatOptions = {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true
+    };
+    return dateTime.toLocaleString(undefined, timeOptions);
 }

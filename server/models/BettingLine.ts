@@ -4,6 +4,13 @@ export enum BetType {
     GameTotal
 }
 
+export enum BetPosition {
+    Favorite,
+    Underdog,
+    Over,
+    Under
+}
+
 export interface IBettingLine {
     id: number;
     betType: BetType;
@@ -20,4 +27,8 @@ export const getBettingLinesByType = (bettingLines: IBettingLine[]) => {
         map[bettingLine.betType] = bettingLine;
         return map;
     }, {});
+}
+
+export const getBetCellId = (bettingLineData: IBettingLine, betPosition: BetPosition) => {
+    return bettingLineData.id + "~" + bettingLineData.betType + "~" + betPosition;
 }

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { To } from 'react-router-dom';
 import { SignIn } from './SignIn';
 
 interface IAuthContext {
@@ -11,7 +10,7 @@ interface IAuthContext {
 }
 
 interface IAuthRequest {
-    isAuthRequested: boolean;
+    isAuthRequested: boolean; //Set to true for the sign in modal to pop up
     onAuthCancelled?: () => void;
     previousRoute?: any;
 }
@@ -31,8 +30,7 @@ export const AuthProvider = (props: any) => {
     return (
         <AuthContext.Provider value={{ isAuthenticated: isAuthenticated, authRequest: authRequest, setAuthRequest: setAuthRequest, setIsAuthenticated: setIsAuthenticated }}>
             {props.children}
-            <SignIn setIsAuthenticated={setIsAuthenticated} />
+            <SignIn />
         </AuthContext.Provider>
-
     )
 }

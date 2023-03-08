@@ -99,6 +99,24 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "baseUrl": "./src",
+    "paths": {
+      "@betting/*": [
+        "betting/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@auth/*": [
+        "auth/*"
+      ],
+      "@models/*": [
+        "models/*"
+      ],
+      "@user/*": [
+        "user/*"
+      ]
+    }
   },
   "include": [
     "src/**/*"

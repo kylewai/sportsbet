@@ -7,7 +7,8 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { manageErrors } from '../utils/DataFetcher';
+import { makePostReq, manageErrors } from '@utils/DataFetcher';
+import { SIGN_IN_URL } from '@utils/serverEndpoints';
 
 const authFormStyle = {
     position: 'absolute',
@@ -22,14 +23,14 @@ const authFormStyle = {
     textAlign: 'center'
 };
 
-export const SignIn = (props: { setIsAuthenticated: (isAuth: boolean) => void }) => {
+export const SignIn = () => {
     const { authRequest, setAuthRequest, setIsAuthenticated } = useContext(AuthContext);
     const [errMsg, setErrMsg] = useState("");
     const usernameInputRef = useRef<HTMLInputElement>();
     const passwordInputRef = useRef<HTMLInputElement>();
     const navigate = useNavigate();
 
-    const authenticate = async () => {
+    const onSignInClicked = async () => {
         const username = usernameInputRef.current?.value;
         const password = passwordInputRef.current?.value;
         if (!username || !password) {
@@ -37,22 +38,8 @@ export const SignIn = (props: { setIsAuthenticated: (isAuth: boolean) => void })
             return;
         }
 
-        fetch("/api/users/login",
-            {
-                method: "POST",
-                body: JSON.stringify(
-                    {
-                        username: username,
-                        password: password
-                    }
-                ),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => manageErrors(response))
+        signIn(username, password)
             .then(() => {
-                //navigate(authRequest.previousRoute ?? "/");
                 setIsAuthenticated(true);
                 setAuthRequest({ isAuthRequested: false });
             })
@@ -74,25 +61,49 @@ export const SignIn = (props: { setIsAuthenticated: (isAuth: boolean) => void })
         <Modal
             open={authRequest.isAuthRequested}
             onClose={onClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
         >
             <Box sx={authFormStyle} component="form">
-                <TextField inputRef={usernameInputRef} fullWidth margin="dense" label="Username" variant="outlined" />
-                <TextField inputRef={passwordInputRef} fullWidth margin="dense" label="Password" type="password" variant="outlined" />
+
+                <TextField inputRef={usernameInputRef}
+                    fullWidth margin="dense"
+                    label="Username"
+                    variant="outlined" />
+
+                <TextField inputRef={passwordInputRef}
+                    fullWidth margin="dense"
+                    label="Password"
+                    type="password"
+                    variant="outlined" />
+
                 <p style={{ color: "red" }}>{errMsg}</p>
-                <Stack direction="column" spacing={1} alignItems="center" sx={{ marginTop: 1 }}>
-                    <Button onClick={authenticate} sx={{ width: 400 }} variant="contained" size="large">Sign in</Button>
-                    <Box sx={{ width: "100%" }}>
-                        <Link onClick={() => setAuthRequest({ isAuthRequested: false })} to="/signup">
-                            <Typography sx={{ float: 'left' }}>Join now</Typography>
-                        </Link>
-                        <Link to="/">
-                            <Typography sx={{ float: 'right' }}>Trouble logging in?</Typography>
-                        </Link>
-                    </Box>
-                </Stack>
+
+                <SignInActions onAuthenticate={onSignInClicked} onSignUp={() => setAuthRequest({ isAuthRequested: false })} />
             </Box>
         </Modal>
     )
+}
+
+interface ISignInActionsProps {
+    onAuthenticate: () => void;
+    onSignUp: () => void;
+}
+
+const SignInActions = ({ onAuthenticate, onSignUp }: ISignInActionsProps) => {
+    return (
+        <Stack direction="column" spacing={1} alignItems="center" sx={{ marginTop: 1 }}>
+            <Button onClick={onAuthenticate} sx={{ width: 400 }} variant="contained" size="large">Sign in</Button>
+            <Box sx={{ width: "100%" }}>
+                <Link onClick={onSignUp} to="/signup">
+                    <Typography sx={{ float: 'left' }}>Join now</Typography>
+                </Link>
+                <Link to="/">
+                    <Typography sx={{ float: 'right' }}>Trouble logging in?</Typography>
+                </Link>
+            </Box>
+        </Stack>
+    );
+}
+
+const signIn = (username: string, password: string) => {
+    return makePostReq(SIGN_IN_URL, { username, password });
 }

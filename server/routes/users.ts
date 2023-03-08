@@ -54,7 +54,15 @@ router.post("/account/balance", (req, res, next) => {
 router.post("/placebet", async (req, res, next) => {
     const placeBetInfo: IBet[] = req.body.placeBetInfo;
     userService.placeBet((req.user as IUser).id, placeBetInfo)
-        .then(() => res.sendStatus(200))
+        .then((followUp) => {
+            if (followUp.data) {
+                res.status(200);
+                res.json(followUp);
+            }
+            else {
+                res.sendStatus(200);
+            }
+        })
         .catch(next);
 });
 

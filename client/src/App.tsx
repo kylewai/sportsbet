@@ -1,13 +1,12 @@
 import './App.css';
 import { Sidebar } from "./Sidebar";
 import Box from '@mui/material/Box';
-import { useParams, BrowserRouter, Routes, Route, Outlet, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { MainContent } from "./MainContent";
 import { CustomAppBar } from "./CustomAppBar";
 import { AuthProvider } from "./auth/AuthProvider";
 import { SignUp } from "./auth/SignUp";
-import { BettingEventsList } from "./BetEvents";
-import { BetSlip } from './BetSlip';
+import { BettingEventsDashboard } from "@betting/BettingEventsDashboard";
 import { Account } from './user/Account';
 import { AuthedComponent } from './auth/AuthedComponent';
 
@@ -19,7 +18,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<Home />}>
               <Route path="leagues">
-                <Route path=":leagueId/events" element={<BettingEventsList />}>
+                <Route path=":leagueId/events" element={<BettingEventsDashboard />}>
                 </Route>
               </Route>
             </Route>

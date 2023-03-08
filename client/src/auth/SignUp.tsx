@@ -3,9 +3,10 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { Stack } from "@mui/material";
-import { manageErrors } from "../utils/DataFetcher";
+import { makePostReq, manageErrors } from "@utils/DataFetcher";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
+import { REGISTER_URL } from '@utils/serverEndpoints';
 
 const authFormStyle = {
     position: 'absolute',
@@ -27,27 +28,14 @@ export const SignUp = () => {
     const navigate = useNavigate();
     const context = useContext(AuthContext);
 
-    const register = async () => {
+    const onSignUpClicked = async () => {
         const username = usernameInputRef.current?.value;
         const password = passwordInputRef.current?.value;
         if (!username || !password) {
             setErrMsg("Username and password must be filled out");
             return;
         }
-        fetch("/api/users/register",
-            {
-                method: "POST",
-                body: JSON.stringify(
-                    {
-                        username: username,
-                        password: password
-                    }
-                ),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => manageErrors(response))
+        signUp(username, password)
             .then(() => {
                 context.setIsAuthenticated(true);
                 navigate("/");
@@ -64,8 +52,11 @@ export const SignUp = () => {
                     <TextField inputRef={passwordInputRef} margin="dense" id="outlined-basic" label="Password" type="password" variant="outlined" />
                 </Stack>
                 <p style={{ color: "red" }}>{errMsg}</p>
-                <Button onClick={register} sx={{ width: 400 }} variant="contained" size="large">Sign up</Button>
+                <Button onClick={onSignUpClicked} sx={{ width: 400 }} variant="contained" size="large">Sign up</Button>
             </Box>
         </>
     )
+}
+const signUp = (username: string, password: string) => {
+    return makePostReq(REGISTER_URL, { username, password });
 }

@@ -5,7 +5,9 @@ import { IUser } from "../models/User";
 import passport from "passport";
 import crypto from "crypto";
 import { Strategy as LocalStrategy } from "passport-local";
-import { IBet } from "../models/Bet";
+import { BetFollowUpAction, getBetPosition, IBet, IBetFollowup, IConfirmBetData } from "../models/Bet";
+import { BetType, getBetCellId } from "../models/BettingLine";
+import { getBettingLine } from "./bettingLineService";
 
 export const getUsersById = async (userId: number): Promise<IUser | undefined> => {
     return userData.getUser(userId);
@@ -32,8 +34,48 @@ export const register = async (username: string, password: string): Promise<IUse
         }));
 }
 
-export const placeBet = async (userId: number, placeBetInfo: IBet[]) => {
-    //TODO: check that they have adequate balance;
+export const placeBet = async (userId: number, placeBetInfo: IBet[]): Promise<IBetFollowup> => {
+    let followUpAction = BetFollowUpAction.None;
+    let followUpData: { [betCellId: string]: IConfirmBetData } | undefined = undefined;
+    console.log(JSON.stringify(placeBetInfo));
+    placeBetInfo.forEach(async info => {
+        const realTimeInfo = (await getBettingLine(info.bettingLineId))[0];
+        const betCellId = getBetCellId(realTimeInfo, getBetPosition(info));
+        let realTimeOdds;
+        if (realTimeInfo.betType === BetType.MoneyLine || realTimeInfo.betType === BetType.Spread) {
+            realTimeOdds = info.favoriteOrUnderdog ? realTimeInfo.favoriteOdds : realTimeInfo.underdogOdds;
+        }
+        else {
+            realTimeOdds = info.overOrUnder ? realTimeInfo.overOdds : realTimeInfo.underOdds;
+        }
+        if (realTimeInfo.betType === BetType.Spread && realTimeInfo.spread !== info.spread) {
+            followUpAction = BetFollowUpAction.ConfirmBet;
+            followUpData = followUpData ?? {};
+            followUpData[betCellId] = {
+                ...followUpData[betCellId],
+                currSpread: realTimeInfo.spread,
+                betPlacedSpread: info.spread
+            };
+        }
+        if (realTimeInfo.betType === BetType.GameTotal && realTimeInfo.gameTotal !== info.gameTotal) {
+            followUpAction = BetFollowUpAction.ConfirmBet;
+            followUpData = followUpData ?? {};
+            followUpData[betCellId] = {
+                ...followUpData[betCellId],
+                currGameTotal: realTimeInfo.gameTotal,
+                betPlacedGameTotal: info.gameTotal
+            };
+        }
+        if (realTimeOdds !== info.odds) {
+            followUpAction = BetFollowUpAction.ConfirmBet;
+            followUpData = followUpData ?? {};
+            followUpData[betCellId] = {
+                ...followUpData[betCellId],
+                currOdds: realTimeOdds,
+                betPlacedOdds: info.odds
+            };
+        }
+    });
     const currentUserBalance = await accountService.getBalance(userId);
     const wagerAmount = placeBetInfo.reduce((total, info) => {
         if (info.wager < 0) {
@@ -45,7 +87,10 @@ export const placeBet = async (userId: number, placeBetInfo: IBet[]) => {
     if (currentUserBalance < wagerAmount) {
         throw new Error("Bet cannot be placed: insufficient funds");
     }
-    return userData.placeBet(userId, placeBetInfo);
+    if (followUpAction === BetFollowUpAction.None) {
+        await userData.placeBet(userId, placeBetInfo);
+    }
+    return { action: followUpAction, data: followUpData };
 }
 
 export const setUpLocalAuthStrategy = () => {

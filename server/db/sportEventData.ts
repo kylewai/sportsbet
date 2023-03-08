@@ -1,4 +1,4 @@
-import * as bettingLineService from "./bettingLineData";
+import * as bettingLineService from "../services/bettingLineService";
 import { Pool } from "pg";
 import { ISportEvent } from "../models/SportEvent";
 import { IBettingLine, getBettingLinesByType } from "../models/BettingLine";

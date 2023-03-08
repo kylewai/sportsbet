@@ -1,20 +1,19 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { ITeam } from './models/Team';
+import { ITeam } from '@models/Team';
 
-export interface IBetSlipInfo {
+export interface IBetSlipItem {
     betId: number;
     betCellId: string;
-    odds: string;
+    odds: number;
     matchSummary: string;
-    wager?: number;
     chosenTeam?: ITeam;
-    spread?: string;
+    spread?: number;
     gameTotal?: number;
 }
 
 export interface IBetSlip {
-    [betCellId: string]: IBetSlipInfo
+    [betCellId: string]: IBetSlipItem
 }
 
 export interface IBetSlipContext {

@@ -4,7 +4,7 @@ import { IBettingLine } from "./BettingLine";
 
 export interface ISportEvent {
     id: number;
-    dateTime: string;
+    dateTime: string; //ISO8601
     homeTeam: ITeam;
     travelTeam: ITeam;
     leagueId: number;
