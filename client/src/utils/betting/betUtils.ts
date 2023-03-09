@@ -1,5 +1,5 @@
 import { IBetSlipItem } from "@betting/BetSlipProvider";
-import { ISportEvent } from "models/SportEvent";
+import { ISportEvent } from "@models/SportEvent";
 import { BetType, BetPosition, IBettingLine } from "../../models/BettingLine";
 
 interface IOddsData {

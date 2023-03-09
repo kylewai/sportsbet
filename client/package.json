@@ -28,10 +28,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "craco eject"
   },
   "eslintConfig": {
     "extends": [
@@ -52,7 +52,9 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.0.0",
     "@types/react": "^18.0.26",
+    "react-app-alias": "^2.2.2",
     "tsconfig-paths-webpack-plugin": "^4.0.0"
   }
 }

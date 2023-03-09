@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@betting/*": [
+                "src/betting/*"
+            ],
+            "@utils/*": [
+                "src/utils/*"
+            ],
+            "@auth/*": [
+                "src/auth/*"
+            ],
+            "@models/*": [
+                "src/models/*"
+            ],
+            "@user/*": [
+                "src/user/*"
+            ]
+        }
+    }
+}
